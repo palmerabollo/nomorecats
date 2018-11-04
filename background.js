@@ -16,10 +16,11 @@ tf.loadFrozenModel(MODEL_URL, WEIGHTS_URL).then((model) => {
 
   async function executeModel(url) {
     const resource = await loadImage(url);
-    const image = tf.fromPixels(resource);
+    const image = tf.fromPixels(resource).toFloat();
+    // Model input pixels should be floats in (0,1) range instead of integers (0,255)
+    const normalized = image.div(255);
 
-    let tensor = tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3]);
-    tensor[0] = image;
+    const tensor = normalized.reshape([1, IMAGE_SIZE, IMAGE_SIZE, 3]);
 
     // const prediction = model.predict({ Placeholder: tensor }) // MobileNet V2
     const prediction = model.predict(tensor); // MobileNet V1
