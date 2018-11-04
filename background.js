@@ -21,8 +21,8 @@ tf.loadFrozenModel(MODEL_URL, WEIGHTS_URL).then((model) => {
     let tensor = tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3]);
     tensor[0] = image;
 
-    const prediction = model.predict({ Placeholder: tensor }) // MobileNet V2
-    // const prediction = model.predict(tensor); // MobileNet V1
+    // const prediction = model.predict({ Placeholder: tensor }) // MobileNet V2
+    const prediction = model.predict(tensor); // MobileNet V1
 
     const output = prediction.dataSync(); // [cat_probability, nocat_probability]
     console.log('Readable prediction for %s', url, output);
