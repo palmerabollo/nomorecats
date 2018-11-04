@@ -2,14 +2,15 @@
   "manifest_version": 2,
 
   "name": "No More Cats",
+  "description": "Block all those annoying cats online",
   "author": "Guido García @palmerabollo",
-  "version": "0.1.0",
-  "description": "Block all those annoying cats",
+  "version": "1.0.0",
   "homepage_url": "https://github.com/palmerabollo/nomorecats",
 
   "browser_action": {
     "default_icon": "images/tab-icon.png",
-    "default_title": "No More Cats"
+    "default_title": "No More Cats",
+    "default_popup": "popup.html"
   },
 
   "background": {
@@ -24,12 +25,17 @@
   }],
 
   "web_accessible_resources": [
-    "images/*", "tensorflow/*"
+    "images/*"
   ],
 
+  "icons": {
+    "16": "images/tab-icon.png",
+    "32": "images/tab-icon.png",
+    "48": "images/tab-icon.png",
+    "128": "images/tab-icon.png"
+  },
+
   "permissions": [
-    "activeTab",
-    "https://*/*",
-    "http://*/*"
+    "storage"
   ]
 }

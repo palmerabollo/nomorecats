@@ -1,16 +1,64 @@
+const DEBUG = 1;
+if (!DEBUG) console.log = () => {};
+
 const images = [...document.getElementsByTagName('img')];
 
-images
-  .filter(processableImage)
-  .forEach(image => {
-    chrome.runtime.sendMessage({url: image.src}, (response) => {
-      if (response && response.result) {
-        const imgURL = chrome.extension.getURL("images/placeholder-image.png");
-        image.src = imgURL;
-      }
-    });
-  });
+images.filter(validImage).forEach(analyzeImage);
 
-function processableImage(image) {
-  return image.width > 64 && image.height > 64;
+function validImage(image) {
+  const valid = image.src &&
+        image.width > 64 && image.height > 64 &&
+        !image.dataset.catReplaced;
+
+  console.log('image %s valid', image.src, valid);
+  return valid;
 }
+
+function analyzeImage(image) {
+  console.log('analyze image %s', image.src);
+
+  chrome.runtime.sendMessage({url: image.src}, response => {
+    console.log('prediction for image %s', image.src, response);
+    console.log(image);
+    if (response && response.result === true) {
+      const replacedImageSrc = chrome.extension.getURL("images/placeholder-image.png");
+      image.src = replacedImageSrc;
+      image.srcset = "";
+      image.dataset.cat = true;
+      image.dataset.catReplaced = true;
+    }
+  });
+}
+
+// Some images can be dynamically loaded after the page is ready.
+// We track those with a MutationObserver on the document body.
+// There is a lot of room for improvement here. Contributions are welcome.
+
+/**
+const onmutation = (mutations) => {
+  for (let mutation of mutations) {
+    const images = [...mutation.addedNodes]
+      .filter(node => node.nodeType === 1) // 1 = element
+      .map(node => {
+        if (node.tagName === 'IMG') {
+          return [node];
+        } else {
+          const nodes = node.getElementsByTagName('img');
+          if (nodes.length > 0) {
+            return [...nodes];
+          } else {
+            return [];
+          }
+        }
+      })
+      .flat();
+
+    console.log('Page contains %d new images', images.length);
+    images.filter(validImage).forEach(analyzeImage);
+  }
+};
+
+const observer = new MutationObserver(onmutation);
+const config = { attributes: false, childList: true, subtree: true };
+observer.observe(document.body, config);
+*/
