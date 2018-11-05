@@ -1,6 +1,8 @@
 # No more cats
 
-A Chrome extension that blocks all those annoying cats online.
+Chrome extension that blocks all those annoying cats online.
+
+![example](./docs/nomorecats.gif)
 
 ## Install
 
