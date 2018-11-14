@@ -9,10 +9,6 @@ function clasifyImages() {
 }
 
 function validImage(image) {
-  if(image.dataset.catReplaced){
-    console.log("Already processed");
-    return false;
-  }  
   const valid = image.src &&
         image.width > 64 && image.height > 64 &&
         !image.dataset.catReplaced;
