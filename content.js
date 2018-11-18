@@ -1,15 +1,17 @@
 const DEBUG = 1;
 if (!DEBUG) console.log = () => {};
 
-const images = [...document.getElementsByTagName('img')];
+let isScrolling;
+let images = [...document.getElementsByTagName('img')];
 
-images.filter(validImage).forEach(analyzeImage);
+function clasifyImages() {
+  [...images, ...document.getElementsByTagName('img')].unique().filter(validImage).forEach(analyzeImage);  
+}
 
 function validImage(image) {
   const valid = image.src &&
         image.width > 64 && image.height > 64 &&
         !image.dataset.catReplaced;
-
   console.log('image %s valid', image.src, valid);
   return valid;
 }
@@ -21,7 +23,7 @@ function analyzeImage(image) {
     console.log('prediction for image %s', image.src, response);
     console.log(image);
     if (response && response.result === true) {
-      const replacedImageSrc = chrome.extension.getURL("images/placeholder-image.png");
+      const replacedImageSrc = "https://source.unsplash.com/random/" + image.width + "x" + image.height;
       image.src = replacedImageSrc;
       image.srcset = "";
       image.dataset.cat = true;
@@ -29,6 +31,19 @@ function analyzeImage(image) {
     }
   });
 }
+
+document.addEventListener("scroll", (images)=>{ 
+  clearTimeout(isScrolling);
+  isScrolling = setTimeout(()=>{clasifyImages()}, 100);
+});
+
+Array.prototype.unique = function() {
+  return this.filter(function (value, index, self) { 
+    return self.indexOf(value) === index;
+  });
+}
+
+clasifyImages();
 
 // Some images can be dynamically loaded after the page is ready.
 // We track those with a MutationObserver on the document body.
